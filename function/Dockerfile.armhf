@@ -1,0 +1,57 @@
+ARG RASPBIAN_VERSION=stretch
+FROM resin/rpi-raspbian:$RASPBIAN_VERSION
+
+# update apt
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends apt-utils \
+	# install necessary build tools \
+	&& apt-get -qy install build-essential cmake pkg-config unzip wget make \
+	# install necessary libraries \
+	&& apt-get -qy install \
+		libgtk2.0-dev \
+		libgtk-3-dev \
+		libatlas-base-dev \
+		gfortran \
+		python2.7-dev \
+		python3-dev \
+		python-pip \
+		python-numpy \
+		python3-pip \
+		python3-numpy \
+        python3-markdown \
+        python3-networkx \
+        python3-h5py \
+        python3-lxml \
+        python3-matplotlib \
+        python3-protobuf \
+        python3-dateutil \
+        python3-scipy \
+        python3-six \
+		libraspberrypi0 \
+		python-setuptools \
+		python3-setuptools \
+	# cleanup apt. \
+	&& apt-get purge -y --auto-remove \
+	&& rm -rf /var/lib/apt/lists/*
+
+WORKDIR /root/
+
+COPY requirements.txt ./
+
+RUN pip3 install -r requirements.txt
+
+RUN wget https://storage.googleapis.com/download.tensorflow.org/deps/pi/2018_03_22/tensorflow-1.6.0-cp35-none-any.whl 
+RUN pip3 install tensorflow-1.6.0-cp35-none-any.whl 
+
+ENV TF_CPP_MIN_LOG_LEVEL=3
+COPY *.py ./
+
+RUN python3 ./pre_download.py
+
+RUN curl -sSL https://github.com/openfaas/faas/releases/download/0.7.0/fwatchdog-armhf > /usr/bin/fwatchdog \
+    && chmod +x /usr/bin/fwatchdog
+
+ENV write_debug="true"
+ENV fprocess="python3 index.py"
+
+CMD ["fwatchdog"]

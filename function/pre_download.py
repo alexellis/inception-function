@@ -10,13 +10,7 @@
 # Copyright 2016 by Magnus Erik Hvass Pedersen
 #
 ########################################################################
-import json
-import numpy as np
-import tensorflow as tf
 import download
-from cache import cache
-import os
-import sys
 
 ########################################################################
 # Various directories and file-names.

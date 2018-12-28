@@ -585,5 +585,5 @@ def invoke(body):
 ########################################################################
 
 if __name__ == '__main__':
-	print(invoke())
+	print(invoke(os.path.join(data_dir, 'cropped_panda.jpg')))
 
