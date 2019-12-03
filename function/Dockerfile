@@ -1,12 +1,15 @@
-FROM tensorflow/tensorflow:latest
+FROM tensorflow/tensorflow:latest-py3
 
 RUN apt-get update -qy \
  && apt-get install -qy \
-       python3-pip
+       python3-pip curl
+       
 RUN curl -sSL https://github.com/openfaas/faas/releases/download/0.7.0/fwatchdog > /usr/bin/fwatchdog \
     && chmod +x /usr/bin/fwatchdog
 
-WORKDIR /root/
+RUN  mkdir /inception
+
+WORKDIR /inception/
 
 COPY requirements.txt ./
 
@@ -19,9 +22,9 @@ RUN python3 ./pre_download.py
 
 COPY *.txt ./
 
-
-
 ENV write_debug="true"
 ENV fprocess="python3 index.py"
+
+USER 10001
 
 CMD ["fwatchdog"]
